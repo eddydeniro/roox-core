@@ -84,17 +84,6 @@
                 </table>
             </div>
         </div>
-                                
-        <?php
-            if(!in_array('locale', ${ROOX_PLUGIN . "_modules"}))
-            {
-                echo "<hr>";
-                $update_url = url_for(ROOX_PLUGIN . "/core/");
-                $add_url = url_for(ROOX_PLUGIN . "/core/form", "active=core");
-                require component_path(ROOX_PLUGIN . "/core/definitions_form");    
-            }
-        ?>
-
     </div>
     <?php
         foreach ($includes as $module_name=>$include) 
@@ -103,9 +92,6 @@
             require $include;
             echo "</div>";
         }
-        // $migrator = new Roox\Migrator([21]);
-        // print_rr($migrator->getData());
     ?>
   </div>
-
 </div>
