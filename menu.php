@@ -1,14 +1,20 @@
 <?php
-require('setting.php');
 $submenu = [];
-foreach (explode(',', ROOX_MODULES) as $module) 
+foreach (array_merge(['core'], ${ROOX_PLUGIN . "_modules"}) as $module) 
 {
-    $path = "plugins/".ROOX_PLUGIN."/modules/$module/menu.php";
+    $path = component_path(ROOX_PLUGIN . "/{$module}/menu");
+    
     if(is_file($path))
     {
-        require($path);
-        $submenu[] = $menu;
+        require $path;
+        if(count($menu))
+        {
+            $submenu[] = $menu;
+        }
     }
 }
-$app_plugin_menu['menu'][] = array('title'=>ucwords(ROOX_PLUGIN),'url'=>url_for(ROOX_PLUGIN),'class'=>'fa-rocket','submenu'=>$submenu);
+if(count($submenu))
+{
+    $app_plugin_menu['menu'][] = array('title'=>ucwords(ROOX_PLUGIN),'url'=>url_for(ROOX_PLUGIN),'class'=>'glyphicon glyphicon-tower text13', 'submenu'=>$submenu);
+}
 ?>

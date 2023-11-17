@@ -1,4 +1,4 @@
-<?php
-define('ROOX_PLUGIN', 'roox');
-define('ROOX_MODULES','module,locale');
+<?php 
+	define('ROOX_PLUGIN', 'roox'); 
+	define('ROOX_MODULES', ''); 
 ?>

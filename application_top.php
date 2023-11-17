@@ -1,20 +1,35 @@
 <?php
-require('setting.php');
-foreach (explode(',', ROOX_MODULES) as $module) 
+require 'setting.php';
+${ROOX_PLUGIN . "_modules"} = explode(',', ROOX_MODULES);
+
+foreach (glob("plugins/".ROOX_PLUGIN."/functions/*") as $item) 
 {
-    $module_class = ucwords(strtolower($module));
-    $paths = [
-        "plugins/".ROOX_PLUGIN."/classes/$module_class.php",
-        "plugins/".ROOX_PLUGIN."/modules/$module/prepare.php",
-        "plugins/".ROOX_PLUGIN."/modules/$module/menu.php"
-    ];
-    foreach ($paths as $path) 
+    if(is_file($item))
     {
-        if(is_file($path))
-        {
-            require($path);
-        }
+        require $item;    
     }
 }
-
+foreach (glob("plugins/".ROOX_PLUGIN."/classes/*") as $item) 
+{
+    if(is_file($item))
+    {
+        require $item;    
+    }
+}
+$dictionary_table = ROOX_PLUGIN . "_dictionary";
+$file = component_path(ROOX_PLUGIN."/core/install");
+if(is_file($file))
+{
+    require $file;
+    rename($file, component_path(ROOX_PLUGIN."/core/_install"));
+}
+require component_path(ROOX_PLUGIN . "/core/init");
+foreach (${ROOX_PLUGIN . "_modules"} as $module_name) 
+{
+    $init = component_path(ROOX_PLUGIN . "/{$module_name}/init");
+    if(is_file($init))
+    {
+        require $init;
+    }
+}
 ?>
