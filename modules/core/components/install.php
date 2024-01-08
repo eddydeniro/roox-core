@@ -31,6 +31,7 @@ db_query("
     ('TEXT_REINSTALL_INFO', '\"Reinstall\" will run the required table creation and data insertion of the module. However it will not replace existing ones.'),
     ('TEXT_DICTIONARY', 'Dictionary'),
     ('TEXT_DICTIONARY_INFO', 'You can add and edit dictionary entry to use as constants in your application. Once it is added, you can only edit its value.'),
+    ('TEXT_GENERAL', 'General'),
     ('TEXT_KEYWORD', 'Keyword');    
 ");
 

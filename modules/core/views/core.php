@@ -11,7 +11,7 @@
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="<?php echo $active_tab == 'core' ? 'active' : ''; ?>"><a href="#general" aria-controls="general" role="tab" data-toggle="tab" class="tab_switcher" data-active="core">General</a></li>
+    <li role="presentation" class="<?php echo $active_tab == 'core' ? 'active' : ''; ?>"><a href="#general" aria-controls="general" role="tab" data-toggle="tab" class="tab_switcher" data-active="core"><?php echo TEXT_GENERAL ?></a></li>
     <?php
     $includes = [];
     $installed_modules = [];
