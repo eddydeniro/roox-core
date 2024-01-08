@@ -1,8 +1,8 @@
 <h3 class="page-title"><a href="<?php echo $module_url ?>"><?php echo ucwords(ROOX_PLUGIN) ?></a></h3>
 <?php
+    $active_tab = ${"{$plugin_name}_active_tab"};
     echo TEXT_VERSION." ".$module_version;
     echo "<p style='padding-top:15px;'>".TEXT_ROOX_INFO."</p>";    
-    $active_tab = $_POST['active'] ? $_POST['active'] : ($_GET['active'] ? $_GET['active'] : 'core');
 ?>
 <hr>
 <h4><?php echo TEXT_SETTINGS; ?></h4>
@@ -11,24 +11,24 @@
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="<?php echo $active_tab == 'core' ? 'active' : ''; ?>"><a href="#general" aria-controls="general" role="tab" data-toggle="tab">General</a></li>
+    <li role="presentation" class="<?php echo $active_tab == 'core' ? 'active' : ''; ?>"><a href="#general" aria-controls="general" role="tab" data-toggle="tab" class="tab_switcher" data-active="core">General</a></li>
     <?php
     $includes = [];
     $installed_modules = [];
 
-    foreach (${ROOX_PLUGIN . "_modules"} as $module_name)
+    foreach (${"{$plugin_name}_modules"} as $module_name)
     {
         if(!$module_name)
         {
             continue;
         }
-        $path = component_path(ROOX_PLUGIN . "/{$module_name}/config");  
+        $path = component_path("{$plugin_name}/{$module_name}/config");  
         if(is_file($path))
         {
-            echo "<li role='presentation' class=".($active_tab == $module_name ? 'active' : '')."><a href='#{$module_name}' aria-controls='{$module_name}' role='tab' data-toggle='tab'>".ucwords($module_name)."</a></li>";
+            echo "<li role='presentation' class=".($active_tab == $module_name ? 'active' : '')."><a href='#{$module_name}' aria-controls='{$module_name}' role='tab' data-toggle='tab' class='tab_switcher' data-active='{$module_name}'>".ucwords($module_name)."</a></li>";
             $includes[$module_name] = $path;
         }        
-        $module_top_path = "plugins/" . ROOX_PLUGIN . "/modules/{$module_name}/module_top.php";
+        $module_top_path = "plugins/{$plugin_name}/modules/{$module_name}/module_top.php";
         if(is_file($module_top_path))
         {
             require $module_top_path;
@@ -47,7 +47,7 @@
             <?php echo TEXT_MODULE_INSTALLER_INFO ?>
         </p>
         <?php
-            echo form_tag('uploader', url_for(ROOX_PLUGIN . "/core/"), ['enctype'=>"multipart/form-data"]);
+            echo form_tag('uploader', url_for("{$plugin_name}/core/"), ['enctype'=>"multipart/form-data"]);
             echo input_file_tag('module_upload');
             echo input_hidden_tag('action', 'install');
             echo '<br>';
@@ -62,9 +62,9 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th><?php echo TEXT_ACTION ?></th>
                             <th><?php echo TEXT_NAME ?></th>
-                            <th><?php echo TEXT_VERSION ?></th>                            
-                            <th style="width:80%;"><?php echo TEXT_DESCRIPTION ?></th>
+                            <th><?php echo TEXT_DESCRIPTION ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,8 +74,15 @@
                             <?php foreach($installed_modules as $key=>$values): ?>
                             <tr>
                                 <td><?php echo $key+1 ?></td>
-                                <td><a href="<?php echo $values['url'] ?>"><?php echo $values['name'] ?></a></td>
-                                <td><?php echo $values['version'] ?></td>
+                                <td>
+                                    <a title="<?php echo TEXT_ACCESS ?>" class="btn btn-default btn-xs" href="#" onclick="open_dialog('<?php echo url_for("{$plugin_name}/core/access_form", "name=" . strtolower($values['name'])); ?>'); return false;">
+                                        <i class="fa fa-users"></i>
+                                    </a>
+                                    <a title="<?php echo TEXT_REINSTALL?>" class="btn btn-default btn-xs" href="<?php echo url_for("{$plugin_name}/core/", "action=reinstall&name=" . strtolower($values['name'])); ?>" >
+                                        <i class="fa fa-angle-double-down"></i>
+                                    </a>
+                                </td>
+                                <td><?php echo ($values['url'] ? "<a href='{$values['url']}' >{$values['name']}</a>" : $values['name']) . '<br />' . $values['version']; ?></td>
                                 <td><?php echo "<b>{$values['title']}</b><br/>{$values['description']}" ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -84,14 +91,26 @@
                 </table>
             </div>
         </div>
+        <div><?php echo "<b>" . TEXT_NOTE ."</b>: <br/>". TEXT_REINSTALL_INFO; ?></div>
     </div>
     <?php
         foreach ($includes as $module_name=>$include) 
         {
             echo "<div role='tabpanel' class='tab-pane fade ".($active_tab == $module_name ? 'in active' : '')."' id='{$module_name}'>";
-            require $include;
+            require($include);
             echo "</div>";
         }
     ?>
   </div>
+
 </div>
+
+<script>
+    $('.tab_switcher').click(function(){
+        $.ajax({
+            url: '<?php echo url_for("{$plugin_name}/core/"); ?>',
+            method: 'post',
+            data: {active: $(this).data('active')}
+        })
+    })
+</script>

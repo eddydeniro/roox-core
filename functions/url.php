@@ -23,4 +23,12 @@ function redirect_to_ref($refUrl, $withTab = false)
     }
     redirect_to($url_module, $url_pars);
 }
+function js_path($path, $plugin = '')
+{
+    return "plugins/" . ($plugin ?: ROOX_PLUGIN) . "/includes/js/{$path}";
+}
+function css_path($path, $plugin = '')
+{
+    return "plugins/" . ($plugin ?: ROOX_PLUGIN) . "/includes/css/{$path}";
+}
 ?>

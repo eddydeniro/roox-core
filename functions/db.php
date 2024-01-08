@@ -27,3 +27,51 @@ function db_get_fields($queryObject)
     }
     return $result;
 }
+function get_fields_values_string($data)
+{
+    if(!is_array($data))
+    {
+        return false;
+    }
+    $isAssociative = is_string(key($data)) || (is_int(key($data)) && key($data));
+    $fields = "";
+    if($isAssociative)
+    {
+        $fields = "(`" . implode("`,`", array_keys($data)) . "`)";
+        $values = "('" . implode("','", array_values($data)) . "')";    
+    }
+    else
+    {
+        $values_array = [];
+        foreach ($data as $key => $value) 
+        {
+            if(!$fields)
+            {
+                $fields = "(`" . implode("`,`", array_keys($value)) . "`)";
+            }
+            $values_array[] = "('" . implode("','", array_values($value)) . "')";            
+        }
+        $values = implode(",", $values_array);
+    }
+    return [$fields, $values];
+}
+function db_insert_update($table, $data, $update_fields = [])
+{
+    if(!is_array($data))
+    {
+        return false;
+    }
+    list($fields, $values) = get_fields_values_string($data);
+    $update_pars = "";
+    if(count($update_fields))
+    {
+        $updates = [];
+        foreach ($update_fields as $field) 
+        {
+            $updates[] = "`{$field}`=VALUES(`{$field}`)";
+        }
+        $update_pars = "ON DUPLICATE KEY UPDATE " . implode(",", $updates);    
+    }
+    return db_query("INSERT INTO {$table} {$fields} VALUES {$values} {$update_pars}");
+}
+?>

@@ -1,6 +1,6 @@
 <?php
 $submenu = [];
-foreach (array_merge(['core'], ${ROOX_PLUGIN . "_modules"}) as $module) 
+foreach (${ROOX_PLUGIN . '_all_modules'} as $module) 
 {
     $path = component_path(ROOX_PLUGIN . "/{$module}/menu");
     
@@ -15,6 +15,6 @@ foreach (array_merge(['core'], ${ROOX_PLUGIN . "_modules"}) as $module)
 }
 if(count($submenu))
 {
-    $app_plugin_menu['menu'][] = array('title'=>ucwords(ROOX_PLUGIN),'url'=>url_for(ROOX_PLUGIN),'class'=>'glyphicon glyphicon-tower text13', 'submenu'=>$submenu);
+    $app_plugin_menu['menu'][] = array('title'=>ucwords(ROOX_PLUGIN),'url'=>url_for(ROOX_PLUGIN . '/core/'),'class'=>'glyphicon glyphicon-tower text13', 'submenu'=>$submenu);
 }
 ?>

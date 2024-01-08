@@ -1,10 +1,8 @@
 <?php
     echo ajax_modal_template_header(TEXT_DICTIONARY);
     echo form_tag('dict_form', $url_form, ['class'=>'form-horizontal']);
-    echo input_hidden_tag('action', 'save_def').input_hidden_tag('active', $_GET['active']);
+    echo input_hidden_tag('action', 'save_def');
 ?>
-<!-- <form action="<?php echo $url_form; ?>" method="post" class="form-horizontal"> -->
-
 <div class="modal-body">
         <div class="form-body">
 
@@ -38,7 +36,6 @@
 ?>
 </form>
 <script>
-    let dict_key_val = "";
     $('#dict_key').on('blur', function(e){
         const val = $(this).val();
         if(!val)

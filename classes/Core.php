@@ -83,6 +83,7 @@ class Core {
 
     static function installModule($inputFile)
     {
+        global ${ROOX_PLUGIN . "_modules"};
         $inputFile = $_FILES['module_upload'];
 
         if($inputFile['type']=='application/x-zip-compressed')
@@ -156,10 +157,19 @@ class Core {
                 }
                 $zip->close();
                 $module_path = "{$destination}/modules/{$module_installed}/";
-                $installFile = $module_path."install.php";
+                $installFile = component_path(ROOX_PLUGIN."/".$module_installed."/install");
                 if(is_file($installFile))
                 {
+                    //because in install.php file may contain variable $module_name
+                    //and variables from globals.php
+                    $module_name = $module_installed;
+                    $globalsFile = component_path(ROOX_PLUGIN."/".$module_installed."/globals");
+                    if(is_file($globalsFile))
+                    {
+                        require $globalsFile;
+                    }
                     require $installFile;
+                    rename($installFile, component_path(ROOX_PLUGIN."/".$module_installed."/_install"));                    
                 }
                 if(count($specFile))
                 {
@@ -194,25 +204,24 @@ class Core {
 
                 file_put_contents($module_path."install_note.txt", $install_notes);
 
-                if(is_file($installFile))
-                {
-                    unlink($installFile);
-                }
                 return ['success'=>true, 'module_path'=>$module_path, 'module_name'=>$module_installed];
             }
             else
             {
                 return ['success'=>false];
-                //return false;
             }
         }  
         return ['success'=>false];
     }
 
-    static function alert($message, $title = TEXT_INFO, $type='success')
+    static function hasAccess($module)
     {
-        return "<script>roox.alert('{$message}', '{$title}', '{$type}');</script>";
-    } 
-
+        global $app_user, ${ROOX_PLUGIN . '_modules_table'};
+        $module = trim($module);
+        $user_id = $app_user['id'];
+        $group_id = $app_user['group_id'];
+        $q = db_query("SELECT id FROM " .${ROOX_PLUGIN . '_modules_table'}. " WHERE name='{$module}' AND (FIND_IN_SET({$user_id},users_id) OR FIND_IN_SET({$group_id},groups_id))");
+        return db_num_rows($q);
+    }
 }
 ?>

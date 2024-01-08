@@ -1,6 +1,6 @@
 <?php
-//Special condition for locale
-if(!in_array('locale', ${ROOX_PLUGIN . "_modules"}))
+//Special condition for module lingua
+if(!in_array('lingua', ${ROOX_PLUGIN . "_modules"}))
 {
     $q = db_query("SELECT * FROM `{$dictionary_table}`");
     $roox_dictionary = [];
