@@ -163,6 +163,7 @@ class Core {
                     //because in install.php file may contain variable $module_name
                     //and variables from globals.php
                     $module_name = $module_installed;
+                    global $dictionary_table;
                     $globalsFile = component_path(ROOX_PLUGIN."/".$module_installed."/globals");
                     if(is_file($globalsFile))
                     {

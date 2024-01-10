@@ -56,8 +56,8 @@ switch ($app_module_action)
         break;
     case 'install':
         $install = Roox\Core::installModule($_FILES['module_upload']);
-        $message = $modul_install=='success' ? TEXT_MODULE_IS_INSTALLED : TEXT_MODULE_INSTALL_FAILED;
-        $type = $modul_install=='success' ? 'success' : 'danger';
+        $message = $install['success'] ? TEXT_MODULE_IS_INSTALLED : TEXT_MODULE_INSTALL_FAILED;
+        $type = $install['success'] ? 'success' : 'danger';
         ${ROOX_PLUGIN.'_alert'} = [$message, $type];
         redirect_to("{$plugin_name}/core/");
 
