@@ -17,7 +17,7 @@ if(isset(${ROOX_PLUGIN.'_alert'}) && count(${ROOX_PLUGIN.'_alert'}))
 {
     list($message, $type) = ${ROOX_PLUGIN.'_alert'};
     echo "<script>";
-    echo "roox.alert('{$message}', '".TEXT_INFO."', '{$type}');";
+    echo "roox.alert('{$message}', '".TEXT_INFO."', '".ucwords($type)."');";
     echo "</script>";
     ${ROOX_PLUGIN.'_alert'} = [];
 }
