@@ -918,7 +918,7 @@ class Element
      * @param  mixed $options
      * @return mixed
      */
-    private function parse(mixed $elements, mixed $data = [], array $options = [], bool $htmlOutput = true)
+    private function parse(mixed $elements, mixed $data = NULL, array $options = [], bool $htmlOutput = true)
     {
         $choices_attributes = self::ATTR_CHOICE;
         $self_closing_tag = self::SELF_CLOSING_TAG;
