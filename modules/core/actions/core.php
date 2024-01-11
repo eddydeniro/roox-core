@@ -65,6 +65,7 @@ switch ($app_module_action)
         $install = component_path(ROOX_PLUGIN."/{$_GET['name']}/_install");
         if(is_file($install))
         {
+            $module_name = $_GET['name'];
             require $install;
         }
         redirect_to("{$plugin_name}/core/");        
