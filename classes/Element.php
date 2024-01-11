@@ -391,7 +391,7 @@ class Element
                             'class'=>'panel-collapse collapse {show}',
                             'role'=>'tabpanel',
                             'aria-labelledby'=>'heading_{key}',
-                            self::VAR_CONTENT=>[
+                            self::VAR_CONTENT_PATTERN=>[
                                 [
                                     self::VAR_TAG=>'div',
                                     'class'=>'panel-body',
@@ -626,7 +626,7 @@ class Element
      * @param  mixed        $a
      * @return boolean
      */
-    private static function isAssociative(mixed $a) {
+    private static function isAssociative($a) {
         if(!is_array($a))
         {
             return false;
@@ -682,7 +682,7 @@ class Element
      * @param  mixed $container
      * @return mixed
      */
-    private function placeInContainer(mixed $container)
+    private function placeInContainer($container)
     {
         $string = $container;
         if(is_array($container))
@@ -726,7 +726,7 @@ class Element
      * @param  mixed $htmlArray
      * @return object
      */
-    private function addData(mixed $data)
+    private function addData($data)
     {
         if($this->html_mode)
         {
@@ -753,7 +753,6 @@ class Element
      */
     private static function interpret(string $string, array $options = [], $attrKey = '')
     {
-
         if(!is_string($string))
         {
             return $string;
@@ -805,7 +804,7 @@ class Element
      * 
      * @return array
      */
-    private static function dataActivator(string $type, array $data, mixed $activeSection, bool $alwaysOpen = false)
+    private static function dataActivator(string $type, array $data, $activeSection, bool $alwaysOpen = false)
     {
         $n = 1;
         if(!$alwaysOpen && $activeSection && is_string($activeSection))
@@ -918,7 +917,7 @@ class Element
      * @param  mixed $options
      * @return mixed
      */
-    private function parse(mixed $elements, mixed $data = NULL, array $options = [], bool $htmlOutput = true)
+    private function parse($elements, $data = NULL, array $options = [], bool $htmlOutput = true)
     {
         $choices_attributes = self::ATTR_CHOICE;
         $self_closing_tag = self::SELF_CLOSING_TAG;
@@ -1051,7 +1050,7 @@ class Element
                 if(($tag=='select' && isset($element['multiple'])) || ($isChoiceInput && $inputType!='radio' && $groupData>1))
                 {
                     $name = $name ? $name : $tag."-".$currentKey.rand(100,900);
-                    $name = str_contains($name, '[]') ? $name : $name.'[]';
+                    $name = (strpos($name, '[]') !== FALSE) ? $name : $name.'[]';
                     $result[$n]['name'] = $name;
                     $element['name'] = $name;
                 }
@@ -1124,7 +1123,7 @@ class Element
                     {
                         if(!is_numeric($selectedValue))
                         {
-                            $result[$n]['name'] = str_contains($result[$n]['name'], '[]') ? $result[$n]['name'] : $result[$n]['name'].'[]';
+                            $result[$n]['name'] = (strpos($result[$n]['name'], '[]') !== FALSE) ? $result[$n]['name'] : $result[$n]['name'].'[]';
                             $result[$n]['multiple'] = '';
                             $element['multiple'] = ''; //So html generator will capture it
                             $element['name'] = $result[$n]['name'];
@@ -1373,7 +1372,7 @@ class Element
                 {
                     if(count($value['choices'])>1)
                     {
-                        $default_options['name'] = str_contains($default_options['name'],'[]') ? $default_options['name'] : $default_options['name'].'[]'; 
+                        $default_options['name'] = (strpos($default_options['name'], '[]') !== FALSE) ? $default_options['name'] : $default_options['name'].'[]'; 
                     }
                 }    
 
@@ -1815,7 +1814,7 @@ class Element
             {
                 $attr['marker'] = $n;
             }
-            if(str_contains($n, self::TEMPLATE_MARK))
+            if(strpos($n, self::TEMPLATE_MARK) !== FALSE)
             {
                 $e = explode(self::TEMPLATE_MARK, $n);
                 switch ($e[0]) {
@@ -1907,10 +1906,10 @@ class Element
                 continue;
             }
             $previous_mode = $mode;
-            $isTag = str_contains($line, ':');
-            $isAttr = str_contains($line, '=');
-            $isContent = str_contains($line, '>');
-            $isContentPattern = str_contains($line, '*');        
+            $isTag = (strpos($line, ':') !== FALSE);
+            $isAttr = (strpos($line, '=') !== FALSE);
+            $isContent = (strpos($line, '>') !== FALSE);
+            $isContentPattern = (strpos($line, '*') !== FALSE);        
             if($isContent || $isContentPattern)
             {
                 $prevLevel = $level;
@@ -2344,7 +2343,6 @@ class Element
         $d = $this->argFormatter(__FUNCTION__, $data, $headers, $activeSection, $options);
         return $this->fromType(__FUNCTION__, [], $d['data'], $d['options']);
     } 
-        
     /**
      * nestedList
      *
