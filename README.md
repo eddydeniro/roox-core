@@ -14,4 +14,7 @@ How to install:
 * Copy all files to a folder named "roox" inside folder plugins of your Rukovoditel installation.
 * Don't forget to add 'roox' in AVAILABLE_PLUGINS section of config/file server.php.
 * Open and login to your Rukovoditel. The module will automatically install some required tables (with prefix 'roox') in your Rukovoditel database.
-* You will immediately see Roox in the sidebar menu. 
+* You will immediately see Roox in the sidebar menu.
+
+
+Compatibility: Rukovoditel 3.5.3
