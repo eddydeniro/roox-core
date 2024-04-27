@@ -183,7 +183,7 @@ class Element
     protected $default_template = [
         'label'=> [
             self::VAR_TAG=>'label',
-            'class'=> 'col-sm-2 control-label',
+            'class'=> 'col-sm-2 control-label {extra_class}',
             self::VAR_CONTENT=>['{VALUE}']
         ],
         'input'=> [
@@ -192,13 +192,14 @@ class Element
             'name'=>'{name}',
             'id'=>'{id}',
             'value'=>'{VALUE}',
-            'class'=>'form-control'
+            'class'=>'form-control {extra_class}'
         ],
         'hidden'=> [
             self::VAR_TAG=>'input',
             'type'=>'hidden',
             'name'=>'{name}',
-            'value'=>'{VALUE}',
+            'id'=>'{id}',
+            'value'=>'{VALUE}'
         ],        
         'color'=> [
             self::VAR_TAG=>'input',
@@ -212,7 +213,7 @@ class Element
             self::VAR_TAG=>'textarea',
             'name'=>'{name}',
             'id'=>'{id}',
-            'class'=>'form-control',
+            'class'=>'form-control {extra_class}',
             'content'=>['{VALUE}']
         ],
         'multiselect'=> [
@@ -249,10 +250,11 @@ class Element
             self::VAR_CONTENT_PATTERN=>[
                 [
                     self::VAR_TAG=>'div',
-                    'class'=>'checkbox',
+                    'class'=>'checkbox-list',
                     self::VAR_CONTENT=>[
                         [
                             self::VAR_TAG=>'label',
+                            'class'=>'checkbox-inline',
                             self::VAR_CONTENT=>[
                                 [
                                     self::VAR_TAG=>'input',
@@ -1176,8 +1178,7 @@ class Element
                                 $value = [$value, [], []];
                             }
                             $currentOptions[$cKey] = $key;
-                            //$currentOptions[$cValue] = $value[0];
-                            $currentOptions[$cValue] = is_array($value) ? $value[0] : $value;
+                            $currentOptions[$cValue] = is_array($value) ? current($value) : $value;
                             $currentOptions['variables'] = isset($dataRef[$key][1]) && is_array($dataRef[$key][1]) ? $dataRef[$key][1] : [];
                             $currentOptions['contentData'] = isset($dataRef[$key][2]) && is_array($dataRef[$key][2]) ? $dataRef[$key][2] : [];
                             
@@ -1294,11 +1295,10 @@ class Element
         {
             return [];
         }
-
+        //print_rr(['type'=>$type, 'data'=>$data, 'options'=>$options]);
         $patternType = $type;
         $options[self::VAR_TYPE] = $type;
         $cDatakey = self::VAR_DATAKEY;
-
         if($type=='formTemplate')
         {
             $withFormTag = $options['withFormTag'] ?? true;
@@ -1328,21 +1328,23 @@ class Element
             $ids = [];
             // $choices_tags = array_keys(self::ATTR_CHOICE['property']);
 
-            $default_options = [
-                'name'=>'name',
-                'id'=>'id',
-                'VALUE'=>'VALUE'
-            ];
             $isSubmitExist = !$withSubmit;
             $current_data = [];
 
+            
             foreach ($data as $key => $value) 
             {
-
+                $default_options = [
+                    'name'=>'name',
+                    'id'=>'id',
+                    'VALUE'=>'VALUE'
+                ];
+    
                 if(!isset($value['element']))
                 {
                     continue;
                 }
+
                 $current_type = $value['element'];
                 
                 if(!in_array($current_type, array_keys($this->default_template)) && !in_array($current_type, self::INPUT_TYPES))
@@ -1394,7 +1396,6 @@ class Element
                     }
                     //unset($value['id']);    
                 }
-
                 $default_options['VALUE'] = $value['value'] ?? '';
                 //unset($value['value']);
 
@@ -1412,10 +1413,17 @@ class Element
                 }
 
                 $element = $this->byType($current_type, [], $default_options);
+
                 $search = array_map(function($item){
                     return "{".$item."}"; 
-                }, array_keys($default_options));        
-                $element['elements'] = json_decode(str_replace($search, array_values($default_options), json_encode($element['elements'])), true);
+                }, array_keys($default_options));
+
+                $json = str_replace($search, array_values($default_options), json_encode($element['elements']));
+                //Tabs and newline characters, unencoded, are not allowed in strings in JSON according to RFC 7159
+                //So we have to replace them before decoding the json
+                $json = str_replace(["\r\n","\t"], ['\r\n','\t'], $json); 
+                $element['elements'] = json_decode($json, true);
+                
                 // if(in_array($current_type, $choices_tags))
                 // {
                 //     //$current_data = $value['options'];
@@ -1462,7 +1470,10 @@ class Element
                 {
                     $container = $this->applyAttributes($container, $value['attr']);
                 } 
-                $elements[self::VAR_CONTENT][] = $container;
+                //Lets apply other custom variables
+                $new_container = json_decode(str_replace(["\r\n","\t"], ['\r\n','\t'], str_replace($search, array_values($default_options), json_encode($container))), true);
+                $elements[self::VAR_CONTENT][] = $new_container;
+                //$elements[self::VAR_CONTENT][] = $container;
             }
             if(!$isSubmitExist)
             {
@@ -1509,7 +1520,11 @@ class Element
         }
 
         //$elements = json_decode(str_replace($search, array_values($options), json_encode($elements)), true);
-
+        // print_rr([
+        //     $type=>$elements,
+        //     'options'=>$options,
+        //     'data'=>$data
+        // ]);
         return ['elements'=>$elements, 'data'=>$data, 'options'=>$options];
     }
     
@@ -1563,7 +1578,7 @@ class Element
 
         $options['parentData'] = $data;
         $options['parentPattern'] = $elements;
-
+        
         $parse_result = $this->parse($elements, $data, $options, $this->html_mode);
 
         if($this->directMarkeredReplacement)
@@ -1722,7 +1737,6 @@ class Element
         {
             return $this;
         }
-
         if(count($targettedAttributes))
         {
             $special_attr = 'marker';
@@ -1765,7 +1779,6 @@ class Element
                 $thisType = $this->typeToTag($type, $htmlArray['elements']);
                 $thisType = $type=='formTemplate' && $options['withFormTag'] ? 'div.'.self::FORM_CONTAINER_CLASS : $thisType;
                 $targettedAttributes = [$thisType=>$targettedAttributes];
-
             }    
             if($applyAttribute)
             {

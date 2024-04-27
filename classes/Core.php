@@ -77,6 +77,7 @@ class Core {
         {
             return false;
         }
+        $value = db_input($value);
         db_query("INSERT INTO ".ROOX_PLUGIN."_dictionary (`dict_key`, `dict_value`) VALUES ('{$key}', '{$value}')");
         return db_insert_id();
     }
@@ -162,8 +163,8 @@ class Core {
                 {
                     //because in install.php file may contain variable $module_name
                     //and variables from globals.php
-                    $module_name = $module_installed;
                     global $dictionary_table;
+                    $module_name = $module_installed;
                     $globalsFile = component_path(ROOX_PLUGIN."/".$module_installed."/globals");
                     if(is_file($globalsFile))
                     {
