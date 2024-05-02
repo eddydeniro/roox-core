@@ -55,6 +55,7 @@
     function showDialog(id){
         $('#def_value').val($('#'+id).val());
         $('#def_value').data('target', id);
+        CKEDITOR.config.baseFloatZIndex = 20000;
         CKEDITOR.replace('def_value', {
             startupFocus: true
         });    

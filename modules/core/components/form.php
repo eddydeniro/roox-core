@@ -3,14 +3,14 @@
     echo form_tag('dict_form', $url_form, ['class'=>'form-horizontal']);
     echo input_hidden_tag('action', 'save_def');
 ?>
-<div class="modal-body">
+<div class="modal-body ajax-modal-width-1100">
         <div class="form-body">
 
             <div class="form-group">
-                <label class="col-md-3 control-label" for="dict_key">
+                <label class="col-md-2 control-label" for="dict_key">
                     <span class="required-label">*</span><?php echo TEXT_KEYWORD ?>
                 </label>
-                <div class="col-md-9">	
+                <div class="col-md-10">	
                     <?php
                         echo input_tag('dict_key', '', ['class'=>'form-control input-large is-unique', 'required'=>'required'])
                     ?>
@@ -18,10 +18,10 @@
             </div>
             
             <div class="form-group">
-                <label class="col-md-3 control-label" for="dict_value">
+                <label class="col-md-2 control-label" for="dict_value">
                     <span class="required-label">*</span><?php echo TEXT_VALUE ?>
                 </label>
-                <div class="col-md-9">	
+                <div class="col-md-10">	
                     <?php
                         echo textarea_tag('dict_value', '', ['class'=>'form-control input-large', 'required'=>'required']);
                     ?>
@@ -36,6 +36,11 @@
 ?>
 </form>
 <script>
+    CKEDITOR.config.baseFloatZIndex = 20000;
+    CKEDITOR.replace('dict_value', {
+        startupFocus: true,
+        toolbar: 'Default'
+    });    
     $('#dict_key').on('blur', function(e){
         const val = $(this).val();
         if(!val)
