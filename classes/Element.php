@@ -636,6 +636,14 @@ class Element
         return is_string(key($a)) || (is_int(key($a)) && key($a));
     }
     
+    static function safe_json_decode($json)
+    {
+        //Tabs and newline characters, unencoded, are not allowed in strings in JSON according to RFC 7159
+        //So we have to replace them before decoding the json
+        $json = str_replace(["\r\n","\t"], ['\r\n','\t'], $json);
+        return json_decode($json, true);
+    }
+
     /**
      * translateCode
      *
@@ -1318,7 +1326,7 @@ class Element
             {
                 $data_keys = array_keys($value);
                 $data_values = array_values($value);
-                $data_keys = json_decode(str_replace(array_keys(self::ALT_VARS), array_values(self::ALT_VARS), json_encode($data_keys)), true);
+                $data_keys = self::safe_json_decode(str_replace(array_keys(self::ALT_VARS), array_values(self::ALT_VARS), json_encode($data_keys)));
                 $alter_data[] = array_combine($data_keys, $data_values);    
             }
 
@@ -1355,15 +1363,6 @@ class Element
                     $elements[self::VAR_CONTENT][] = $element;
                     continue;                    
                 }
-                //if $current_type is in default_template but not input or
-                // if(in_array($current_type, array_keys($this->default_template)))
-                // {
-                //     $element = $value;
-                //     $element[self::VAR_TAG] = $value['element'];
-                //     unset($value['element']);
-                //     $elements[self::VAR_CONTENT][] = $element;
-                //     continue;                    
-                // }                 
                 if($current_type=='submit')
                 {
                     $isSubmitExist = true;
@@ -1396,7 +1395,9 @@ class Element
                     }
                     //unset($value['id']);    
                 }
-                $default_options['VALUE'] = $value['value'] ?? '';
+                // Add addslashes because it's possible that the value contains some string that needs to be escaped, like double quotes
+                //$default_options['VALUE'] = addslashes($value['value']) ?? '';
+                $default_options['VALUE'] = addcslashes($value['value'], '"') ?? '';
                 //unset($value['value']);
 
                 //unset($value['options']);
@@ -1409,21 +1410,14 @@ class Element
                     {
                         continue;
                     }
-                    $default_options[$k] = $v;
+                    $default_options[$k] = addcslashes($v, '"');
                 }
-
                 $element = $this->byType($current_type, [], $default_options);
-
                 $search = array_map(function($item){
                     return "{".$item."}"; 
                 }, array_keys($default_options));
 
-                $json = str_replace($search, array_values($default_options), json_encode($element['elements']));
-                //Tabs and newline characters, unencoded, are not allowed in strings in JSON according to RFC 7159
-                //So we have to replace them before decoding the json
-                $json = str_replace(["\r\n","\t"], ['\r\n','\t'], $json); 
-                $element['elements'] = json_decode($json, true);
-                
+                $element['elements'] = self::safe_json_decode(str_replace($search, array_values($default_options), json_encode($element['elements'])));
                 // if(in_array($current_type, $choices_tags))
                 // {
                 //     //$current_data = $value['options'];
@@ -1458,8 +1452,7 @@ class Element
                     continue;
                 }
                 $containerTemplate = $options['containerTemplate'] ?? 'container';
-                $container = $this->getTemplate($containerTemplate);
-                $container = json_decode(str_replace('{label}', $label_value, json_encode($container)), true);
+                $container = self::safe_json_decode(str_replace('{label}', $label_value, json_encode($this->getTemplate($containerTemplate))));
                 array_walk_recursive($container, function(&$value, $key, $element) {
                     if($value=='{{element}}')
                     {
@@ -1471,9 +1464,7 @@ class Element
                     $container = $this->applyAttributes($container, $value['attr']);
                 } 
                 //Lets apply other custom variables
-                $new_container = json_decode(str_replace(["\r\n","\t"], ['\r\n','\t'], str_replace($search, array_values($default_options), json_encode($container))), true);
-                $elements[self::VAR_CONTENT][] = $new_container;
-                //$elements[self::VAR_CONTENT][] = $container;
+                $elements[self::VAR_CONTENT][] = self::safe_json_decode(str_replace($search, array_values($default_options), json_encode($container)));
             }
             if(!$isSubmitExist)
             {

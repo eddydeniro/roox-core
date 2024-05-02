@@ -23,16 +23,17 @@
             ?>
                 <tr>
                     <td><div style="padding:8px 0;"><?php echo $values['dict_key'] ?></div></td>
-                    <td><i class="fa fa-edit showDialog" onclick="showDialog('<?php echo "definitions_{$id}"; ?>')" style="position:absolute;margin-top:10px;cursor:pointer;"></i><?php echo input_tag("definitions[{$id}]", $values['dict_value'], array('class' => 'form-control transparent', 'style'=>'margin-left:20px;width:100%')) ?></td>
+                    <td><i class="fa fa-edit" onclick="showDialog('<?php echo "definitions_{$id}"; ?>')" style="position:absolute;margin-top:10px;cursor:pointer;"></i><?php echo input_tag("definitions[{$id}]", $values['dict_value'], array('class' => 'form-control transparent', 'style'=>'margin-left:20px;width:100%')) ?></td>
                 </tr>  
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
 </form>
-
-<dialog id="favDialog" class="dialog">
-  <div class="modal-header">  			
+ 
+<dialog id="favDialog" class="dialog" style="border-radius:6px;border-color:rgba(0,0,0,0.2);">
+  <div class="modal-header">
+    <button type="button" class="close" onclick="closeDialog()" style="outline:none;"></button>
 	<h4 class="modal-title"><?php echo TEXT_EDIT; ?></h4>
   </div>
   <form method="dialog" id="dialogForm">
@@ -64,6 +65,7 @@
         }, 500);
     }
     function closeDialog(){
+        $('#favDialog')[0].close();
         CKEDITOR.instances['def_value'].destroy(true);        
     }
     function saveDialog(){
