@@ -92,6 +92,14 @@
             </div>
         </div>
         <div><?php echo "<b>" . TEXT_NOTE ."</b>: <br/>". TEXT_REINSTALL_INFO; ?></div>
+        <?php 
+            if(!in_array('lingua', ${ROOX_PLUGIN . "_modules"})): 
+                echo "<hr>";
+                $update_url = url_for("{$plugin_name}/core/");
+                $add_url = url_for("{$plugin_name}/core/form", "active=core");
+                require component_path("{$plugin_name}/core/definitions_form");
+            endif; 
+        ?>        
     </div>
     <?php
         foreach ($includes as $module_name=>$include) 
